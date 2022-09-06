@@ -16,11 +16,19 @@ export const Phone = props => {
         <div className="phone col-lg-3">
             <div className="wrapper">
             <div className="image">
-                <img src={props.img} />
+                <img src={props.img}
+                onError={({ currentTarget }) => {
+                    currentTarget.onerror = null; 
+                    currentTarget.src="unknown.png";
+                  }}
+                />
             </div>
             <div className="bottom">
                 <h3>
                     {props.name}
+                </h3>
+                <h3>
+                    {props.model}
                 </h3>
                 <p>
                     Ram : {props.ram}
@@ -30,6 +38,9 @@ export const Phone = props => {
                 </p>
                 <h5>
                     <Link  to={newTo}>Update</Link>
+                </h5>
+                <h5 >
+                    <Link style={{color:"red"}} to={newTo}>Delete</Link>
                 </h5>
             </div>
             </div>

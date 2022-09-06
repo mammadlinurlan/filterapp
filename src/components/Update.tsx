@@ -3,78 +3,104 @@ import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import '../App.css'
 import { usePhoneContext } from "../hooks.js";
+import Swal from "sweetalert2";
 
-export const Update = (props) =>{
 
-    const [phone,setPhone] = React.useState()
-    const [name,setName] = React.useState(0)
-    const [ram,setRam] = React.useState(0)
-    const [price,setPrice] = React.useState(0)
-    const [id,setId] = React.useState()
+export const Update = (props) => {
+
+    const [brand, setBrand] = React.useState('')
+    const [ram, setRam] = React.useState(0)
+    const [price, setPrice] = React.useState(0)
+    const [image, setImage] = React.useState('')
+    const [model, setModel] = React.useState('')
+
     const location = useLocation();
-    const {phoneId} = useParams();
+    const { phoneId } = useParams();
     const phones = usePhoneContext();
-    console.log("phones",phones);
-     useEffect(()=>{
-              axios.get('http://localhost:3000/api.json').then(({data})=>{
-                    let phone = data.phones.find((phone)=> phone.id === phoneId)
-                    setPhone(phone)
-                    setName(phone.name);
-                    setRam(phone.ram)
-                    setPrice(phone.price)
-                    
-              })
-     },[])
+    console.log("phones", phones);
+    useEffect(() => {
+        axios.get('http://localhost:3000/all').then(({ data }) => {
+            console.log(data)
+            let phone = data.find((phone) => phone._id === phoneId)
+            setBrand(phone.brand);
+            setRam(phone.ram)
+            setPrice(phone.price)
+            setModel(phone.model)
+            setImage(phone.img)
 
-     const nameChangeHandler = (e) =>{
-        setName(e.target.value)
-     }
+        })
+    }, [])
 
-     const ramChangeHandler = (e) =>{
+    const brandChangeHandler = (e) => {
+        setBrand(e.target.value)
+    }
+
+    const ramChangeHandler = (e) => {
         setRam(e.target.value)
-     }
-     const priceChangeHandler = (e) =>{
+    }
+    const priceChangeHandler = (e) => {
         setPrice(e.target.value)
-     }
+    }
 
-     useEffect(()=>{
-        console.log(`name : ${name} --- ram : ${ram}  --- price : ${price}`)
-     },[name,ram,price])
+    const modelChangeHandler = (e) => {
+        setModel(e.target.value)
+    }
+    const imageChangeHandler = (e) => {
+        setImage(e.target.value)
+    }
 
-     const submitHandler = (e) => {
+    useEffect(() => {
+        console.log(`brand : ${brand} --- ram : ${ram}  --- price : ${price} --- model : ${model} ---- image : ${image}`)
+    }, [brand, ram, price, image, model])
+
+    const submitHandler = (e) => {
         e.preventDefault();
-        axios.put(`http://localhost:3000/api.json/${phoneId}`,
+        axios.put(`http://localhost:3000/update/${phoneId}`,
         {
-            name:name,
-            price:price,
-            ram:ram
+            brand:brand,
+            price:Number(price),
+            ram:Number(ram),
+            model:model,
+            img:image
 
         }).then(res=>{
             console.log(res)
+
         }).catch(error=>{
             console.log(error)
         })
-     }
+        window.location.href = `http://${window.location.host}`
+
         
 
-    return(
-        <>
-        <form onSubmit={submitHandler}>
-            <label htmlFor="name">Name</label>
-            <input onChange={(e)=>nameChangeHandler(e)} value={name}  id="name" />
-           
-            <label htmlFor="ram">Ram</label>
-            <input onChange={(e)=>ramChangeHandler(e)} value={ram} id="ram"/>
-           
-            
-            <label htmlFor="price">Price</label>
-            <input onChange={(e)=>priceChangeHandler(e)} value={price} id="price"/>
 
-            <button className="btn btn-primary">Save</button>
-        </form>
+    }
+
+
+    return (
+        <>
+            <form onSubmit={(e) => submitHandler(e)}>
+                <label htmlFor="brand">Brand</label>
+                <input type="text" onChange={(e) => brandChangeHandler(e)} value={brand} required id="brand" />
+
+                <label htmlFor="model">Model</label>
+                <input type="text" onChange={(e) => modelChangeHandler(e)} value={model} required id="model" />
+
+                <label htmlFor="img">Image</label>
+                <input type="text" onChange={(e) => imageChangeHandler(e)} value={image} required id="img" />
+
+                <label htmlFor="ram">Ram</label>
+                <input type="number" onChange={(e) => ramChangeHandler(e)} value={ram} required id="ram" />
+
+
+                <label htmlFor="price">Price</label>
+                <input type="number" onChange={(e) => priceChangeHandler(e)} value={price} required id="price" />
+
+                <button className="btn btn-primary">Save</button>
+            </form>
         </>
 
-      
+
 
     )
 }
